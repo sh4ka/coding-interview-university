@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title:  "Welcome to WSE!"
 date:   2018-02-13 10:54:15 +0000
 categories: jekyll update
