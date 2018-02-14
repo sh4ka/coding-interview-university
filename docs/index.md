@@ -1,6 +1,8 @@
 ---
-# You don't need to edit this file, it's empty on purpose.
-# Edit theme's home layout instead if you wanna make some changes
-# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-layout: home
+layout: default
 ---
+
+<div class="container">
+  <p>This is just a repository of my advancement in a software engineer career path. Since I became a web developer this was always my target.</p>
+</div>  
+</div>
