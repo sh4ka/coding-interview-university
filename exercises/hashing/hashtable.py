@@ -2,12 +2,16 @@ import platform
 import random
 
 class Node:
-    def __init__(self, init_data):
+    def __init__(self, init_data, value):
         self.data = init_data
+        self.value = value
         self.next = None
 
     def get_data(self):
         return self.data
+
+    def get_value(self):
+        return self.value
 
     def get_next(self):
         return self.next
@@ -18,6 +22,9 @@ class Node:
     def set_next(self, new_next):
         self.next = new_next
 
+    def set_value(self, new_value):
+        self.value = new_value
+
 
 class UnorderedList:
 
@@ -27,8 +34,8 @@ class UnorderedList:
     def is_empty(self):
         return self.head is None
 
-    def add(self, item):
-        temp = Node(item)
+    def add(self, item, value):
+        temp = Node(item, value)
         temp.set_next(self.head)
         self.head = temp
 
@@ -50,7 +57,7 @@ class UnorderedList:
             else:
                 current = current.get_next()
 
-        return found
+        return current.get_value()
 
     # I added some modifications here to make it more flexible:
     # Returning removed item
@@ -106,12 +113,13 @@ class Hashtable(object):
     words = []
     collisions = 0
     
-    
     def __init__(self, n):
+        self.prime = self.get_prime(len(self.table))
         self.n = n
         self.m = self.n * self.sparseness
+        self.a = random.randrange(0, self.prime-1)
+        self.b = random.randrange(0, self.prime-1)
         self.table = [None] * self.m
-        self.prime = self.get_prime(len(self.table))
         self.w = self.get_w_size()
         self.prepare_words(n)
     
@@ -165,35 +173,41 @@ class Hashtable(object):
         return [(a*key) % 2 ** self.w] >> (self.w - r)
         
     def get_hash_universal(self, key):
-        a = random.randrange(0, self.prime-1)
-        b = random.randrange(0, self.prime-1)
-        return ((a * key + b) % self.prime) % len(self.table)
+        return ((self.a * key + self.b) % self.prime) % len(self.table)
     
         
     def get_alpha(self):
         return str(self.n / (self.m - self.collisions))
+    
+    def get_hashkey(self, word):
+        prehashcode = hash(word)
+        return hashtable.get_hash_universal(prehashcode)
         
     
-    def add_item(self, item, key):
+    def add_item(self, item, value):
+        key = self.get_hashkey(item)
         if self.table[key] is not None:
             self.collisions += 1
-            self.table[key].add(item)
-            return self.table
+            self.table[key].add(item, value)
         linked_list = UnorderedList()
-        linked_list.add(item)
+        linked_list.add(item, value)
         self.table[key] = linked_list
-        return self.table
+        return key
         
     
     def get_item(self, item):
-        pass
+        key = self.get_hashkey(item)
+        if self.table[key] is not None:
+            return self.table[key].search(item)
+        
     
 hashtable = Hashtable(100)
-for word in hashtable.words:
-    prehashcode = hash(word)
-    hashposition = hashtable.get_hash_universal(prehashcode)
-    hashtable.add_item(word, hashposition)
+for index, word in enumerate(hashtable.words):
+    print('{} encodes to {}'.format(word, hashtable.add_item(word, index)))
     
 
 print('Collisions {}'.format(hashtable.collisions))
 print('Load factor is {}'.format(hashtable.get_alpha()))
+desired_item = hashtable.words[random.randint(0, 100)]
+print('Fetching random word from table -> {}'.format(desired_item))
+print('Value for {} is {}'.format(desired_item, hashtable.get_item(desired_item)))
