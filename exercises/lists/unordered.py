@@ -1,4 +1,4 @@
-from unittest import TestCase
+import unittest
 
 
 class Node:
@@ -96,7 +96,7 @@ class UnorderedList:
         return True
 
 
-class NodeTest(TestCase):
+class NodeTest(unittest.TestCase):
     def setUp(self):
         self.sut: Node = Node(123)
 
@@ -116,7 +116,7 @@ class NodeTest(TestCase):
         self.assertEqual(self.sut.get_next(), next_node)
 
 
-class UnorderedListTest(TestCase):
+class UnorderedListTest(unittest.TestCase):
     def setUp(self):
         self.sut: UnorderedList = UnorderedList()
 
@@ -161,3 +161,6 @@ class UnorderedListTest(TestCase):
         self.sut.append(125)
         self.sut.append(126)
         self.assertEqual(self.sut.get(), base_arr)
+        
+if __name__ == '__main__':
+    unittest.main()
