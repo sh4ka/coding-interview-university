@@ -1,8 +1,8 @@
 import platform
-import random
+from random import randrange, randint
 
 class Node:
-    def __init__(self, init_data, value):
+    def __init__(self, init_data, value=None):
         self.data = init_data
         self.value = value
         self.next = None
@@ -81,6 +81,22 @@ class UnorderedList:
         if return_removed is True:
             return current
         return found
+        
+    def unset(self, item):
+        current = self.head
+        previous = None
+        found = False
+        ended = False
+        while not found and not ended:
+            if current.get_data() == item:
+                found = True
+            else:
+                previous = current
+                current = current.get_next()
+            if current.get_next() is None:
+                ended = True
+        if found:
+            current.set_data('False')
 
     def get(self):
         ret_arr = []
@@ -114,14 +130,16 @@ class Hashtable(object):
     collisions = 0
     
     def __init__(self, n):
-        self.prime = self.get_prime(len(self.table))
         self.n = n
         self.m = self.n * self.sparseness
-        self.a = random.randrange(0, self.prime-1)
-        self.b = random.randrange(0, self.prime-1)
         self.table = [None] * self.m
+        self.prime = self.get_prime(len(self.table))
+        
+        self.a = randrange(1, 100)
+        self.b = randrange(1, 100)
+        
         self.w = self.get_w_size()
-        self.prepare_words(n)
+        self.prepare_words(self.n)
     
     def prepare_words(self, n):
         wfile = open('/usr/share/dict/words')
@@ -155,7 +173,6 @@ class Hashtable(object):
                     
         for i in range(len(is_prime)-1, -1, -1):
             if is_prime[i]:
-                self.prime = i
                 return i
                 
                 
@@ -168,9 +185,10 @@ class Hashtable(object):
     def get_hash_division(self, key):
         return key % self.prime
         
-    # this is not working atm, but this is the theory
+    # this is not working atm, but this is the theory:
+    # [(a*key) % 2 ** self.w] >> (self.w - r)
     def get_hash_multiplication(self, key):
-        return [(a*key) % 2 ** self.w] >> (self.w - r)
+        pass
         
     def get_hash_universal(self, key):
         return ((self.a * key + self.b) % self.prime) % len(self.table)
@@ -195,19 +213,31 @@ class Hashtable(object):
         return key
         
     
+    def exists_item(self, item):
+        key = self.get_hashkey(item)
+        if self.table[key] is not None:
+            return self.table[key].search(item) is not None
+        
+    
     def get_item(self, item):
         key = self.get_hashkey(item)
         if self.table[key] is not None:
             return self.table[key].search(item)
         
     
+    def remove_item(self, item):
+        key = self.get_hashkey(item)
+        if self.table[key] is not None:
+            return self.table[key].unset(item)
+        
+    
 hashtable = Hashtable(100)
 for index, word in enumerate(hashtable.words):
-    print('{} encodes to {}'.format(word, hashtable.add_item(word, index)))
+    print('Key:{} -> value:{} encodes to {}'.format(word, index, hashtable.add_item(word, index)))
     
 
 print('Collisions {}'.format(hashtable.collisions))
 print('Load factor is {}'.format(hashtable.get_alpha()))
-desired_item = hashtable.words[random.randint(0, 100)]
+desired_item = hashtable.words[randint(0, 100)]
 print('Fetching random word from table -> {}'.format(desired_item))
-print('Value for {} is {}'.format(desired_item, hashtable.get_item(desired_item)))
+print('Value for Key->{} is {}'.format(desired_item, hashtable.get_item(desired_item)))
